@@ -59,6 +59,7 @@ function App() {
 
   console.log("To Do:", toDoList);
 
+  // toDoList에 item을 추가하는 함수
   const handleAdd = (c: string) => {
     if (c.replaceAll(" ", "") !== "") {
       dispatch({
@@ -76,6 +77,7 @@ function App() {
     setContent("");
   };
 
+  // toDoList에서 item을 삭제하는 함수
   const handleDelete = (id: string) => {
     dispatch({
       type: "DELETE",
@@ -83,6 +85,7 @@ function App() {
     });
   };
 
+  // toDoList에서 item을 수정(업데이트)하는 함수
   const handleUpdate = (todo: TypeToDo) => {
     dispatch({
       type: "UPDATE",
@@ -92,6 +95,7 @@ function App() {
     setEditContent("");
   };
 
+  // item의 status를 변경하는 함수
   const handleStatus = (todo: TypeToDo, text: string) => {
     if (text === "edit") {
       setEditContent(todo.content);
