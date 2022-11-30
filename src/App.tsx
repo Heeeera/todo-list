@@ -1,36 +1,54 @@
 import React, { useState, useReducer, useRef } from "react";
 import {
-  Container,
   Grid,
-  Button,
   FormControl,
   TextField,
-  Input,
   Typography,
-  Checkbox,
 } from "@mui/material";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import EditIcon from "@mui/icons-material/Edit";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CheckIcon from "@mui/icons-material/Check";
+import EditItem from "./components/EditItem";
+import DoneItem from "./components/DoneItem";
+import ToDoItem from "./components/ToDoItem";
+
+export interface TypeToDo {
+  id: string;
+  content: string;
+  status: string;
+}
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {
     case "ADD":
       return [...state, action.todo];
     case "DELETE":
-      return state.filter((todo: any) => todo.id !== action.id);
+      return state.filter((todo: TypeToDo) => todo.id !== action.id);
     case "EDIT":
-      return state.map((todo: any) =>
+      return state.map((todo: TypeToDo) =>
         todo.id === action.id ? { ...todo, status: "edit" } : todo
       );
+    case "DONE":
+      return state.map((todo: TypeToDo) =>
+        todo.id === action.id ? { ...todo, status: "done" } : todo
+      );
+    case "READY":
+      return state.map((todo: TypeToDo) =>
+        todo.id === action.id ? { ...todo, status: "ready" } : todo
+      );
     case "UPDATE":
-      return state.map((todo: any) =>
+      return state.map((todo: TypeToDo) =>
         todo.id === action.id
           ? { ...todo, content: action.content, status: "ready" }
           : todo
       );
   }
 };
+
+const theme = createTheme({
+  typography: {
+    fontFamily: "Spoqa Han Sans",
+  },
+});
 
 function App() {
   const [state, dispatch] = useReducer(reducer, []);
@@ -42,10 +60,6 @@ function App() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setContent(e.target.value);
-  };
-
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditContent(e.target.value);
   };
 
   const handleAdd = () => {
@@ -61,22 +75,14 @@ function App() {
     setContent("");
   };
 
-  const handleDelete = (id: any) => {
+  const handleDelete = (id: string) => {
     dispatch({
       type: "DELETE",
       id: id,
     });
   };
 
-  const handleEdit = (todo: any) => {
-    setEditContent(todo.content);
-    dispatch({
-      type: "EDIT",
-      id: todo.id,
-    });
-  };
-
-  const handleUpdate = (todo: any) => {
+  const handleUpdate = (todo: TypeToDo) => {
     dispatch({
       type: "UPDATE",
       id: todo.id,
@@ -85,77 +91,87 @@ function App() {
     setEditContent("");
   };
 
+  const handleStatus = (todo: TypeToDo, text: string) => {
+    if (text === "edit") {
+      setEditContent(todo.content);
+      dispatch({
+        type: "EDIT",
+        id: todo.id,
+      });
+    } else if (text === "done") {
+      dispatch({
+        type: "DONE",
+        id: todo.id,
+      });
+    } else if (text === "ready") {
+      dispatch({
+        type: "READY",
+        id: todo.id,
+      });
+    }
+  };
+
   return (
-    <Grid
-      container
-      spacing={5}
-      direction="column"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Grid item>
-        <Typography variant="h2">To do list</Typography>
+    <ThemeProvider theme={theme}>
+      <Grid
+        container
+        rowSpacing={5}
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        sx={{ maxWidth: "80vw", margin: "5rem auto" }}
+      >
+        <Grid item>
+          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+            To Do List
+          </Typography>
+        </Grid>
+        <Grid item sx={{ display: "flex", alignItems: "center" }}>
+          <FormControl>
+            <TextField
+              required
+              id="to-do-input"
+              value={content}
+              placeholder="Add new item"
+              size="small"
+              onChange={handleChange}
+              sx={{ width: "15rem", ml: 5 }}
+            />
+          </FormControl>
+          <CheckIcon onClick={handleAdd} sx={{ color: "green", ml: 3 }} />
+        </Grid>
+        <Grid item>
+          {toDoList &&
+            toDoList.map(
+              (todo: any) =>
+                todo.content &&
+                (todo.status === "edit" ? (
+                  <EditItem
+                    todo={todo}
+                    handleUpdate={handleUpdate}
+                    editContent={editContent}
+                    setEditContent={setEditContent}
+                    key={todo.id}
+                  />
+                ) : todo.status === "done" ? (
+                  <DoneItem
+                    todo={todo}
+                    handleDelete={handleDelete}
+                    handleStatus={handleStatus}
+                    key={todo.id}
+                  />
+                ) : (
+                  <ToDoItem
+                    todo={todo}
+                    handleDelete={handleDelete}
+                    handleStatus={handleStatus}
+                    key={todo.id}
+                  />
+                ))
+            )}
+        </Grid>
       </Grid>
-      <Grid item sx={{ display: "flex", alignItems: "center" }}>
-        <FormControl>
-          <TextField
-            required
-            id="to-do-input"
-            value={content}
-            placeholder="Add new item"
-            size="small"
-            onChange={handleChange}
-          />
-        </FormControl>
-        <CheckIcon onClick={handleAdd} sx={{ color: "green", ml: 2 }} />
-      </Grid>
-      <Grid item>
-        {toDoList &&
-          toDoList.map(
-            (todo: any) =>
-              todo.content &&
-              (todo.status === "edit" ? (
-                <Grid container direction="row" key={todo.id}>
-                  <Grid item>
-                    <FormControl>
-                      <Input
-                        defaultValue={todo.content}
-                        onChange={handleEditChange}
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item>
-                    <CheckIcon
-                      onClick={() => handleUpdate(todo)}
-                      sx={{ color: "green", ml: 2 }}
-                    />
-                  </Grid>
-                </Grid>
-              ) : (
-                <Grid
-                  container
-                  direction="row"
-                  key={todo.id}
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <Checkbox />
-                  </Grid>
-                  <Grid item>
-                    <Typography>{todo.content}</Typography>
-                  </Grid>
-                  <Grid item>
-                    <EditIcon onClick={() => handleEdit(todo)} />
-                    <HighlightOffIcon
-                      onClick={() => handleDelete(todo.id)}
-                      sx={{ color: "red" }}
-                    />
-                  </Grid>
-                </Grid>
-              ))
-          )}
-      </Grid>
-    </Grid>
+    </ThemeProvider>
   );
 }
 
