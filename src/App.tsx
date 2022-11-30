@@ -1,10 +1,5 @@
 import React, { useState, useReducer, useRef } from "react";
-import {
-  Grid,
-  FormControl,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Grid, FormControl, TextField, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CheckIcon from "@mui/icons-material/Check";
 import EditItem from "./components/EditItem";
@@ -62,16 +57,22 @@ function App() {
     setContent(e.target.value);
   };
 
-  const handleAdd = () => {
-    dispatch({
-      type: "ADD",
-      todo: {
-        id: countId.current,
-        content: content,
-        status: "ready",
-      },
-    });
-    countId.current += 1;
+  console.log("To Do:", toDoList);
+
+  const handleAdd = (c: string) => {
+    if (c.replaceAll(" ", "") !== "") {
+      dispatch({
+        type: "ADD",
+        todo: {
+          id: countId.current,
+          content: content,
+          status: "ready",
+        },
+      });
+      countId.current += 1;
+    } else {
+      alert("Please enter the content.");
+    }
     setContent("");
   };
 
@@ -138,8 +139,12 @@ function App() {
               sx={{ width: "15rem", ml: 5 }}
             />
           </FormControl>
-          <CheckIcon onClick={handleAdd} sx={{ color: "green", ml: 3 }} />
+          <CheckIcon
+            onClick={() => handleAdd(content)}
+            sx={{ color: "green", ml: 3 }}
+          />
         </Grid>
+        <Typography variant="body1" sx={{mt: 3}}>{toDoList.length} Items</Typography>
         <Grid item>
           {toDoList &&
             toDoList.map(
