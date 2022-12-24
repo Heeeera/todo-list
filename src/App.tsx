@@ -50,14 +50,11 @@ function App() {
   const toDoList = state;
 
   const [content, setContent] = useState<string>("");
-  const [editContent, setEditContent] = useState<string>("");
   const countId = useRef<number>(1);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setContent(e.target.value);
   };
-
-  console.log("To Do:", toDoList);
 
   // toDoList에 item을 추가하는 함수
   const handleAdd = (c: string) => {
@@ -75,45 +72,6 @@ function App() {
       alert("Please enter the content.");
     }
     setContent("");
-  };
-
-  // toDoList에서 item을 삭제하는 함수
-  const handleDelete = (id: string) => {
-    dispatch({
-      type: "DELETE",
-      id: id,
-    });
-  };
-
-  // toDoList에서 item을 수정(업데이트)하는 함수
-  const handleUpdate = (todo: TypeToDo) => {
-    dispatch({
-      type: "UPDATE",
-      id: todo.id,
-      content: editContent,
-    });
-    setEditContent("");
-  };
-
-  // item의 status를 변경하는 함수
-  const handleStatus = (todo: TypeToDo, text: string) => {
-    if (text === "edit") {
-      setEditContent(todo.content);
-      dispatch({
-        type: "EDIT",
-        id: todo.id,
-      });
-    } else if (text === "done") {
-      dispatch({
-        type: "DONE",
-        id: todo.id,
-      });
-    } else if (text === "ready") {
-      dispatch({
-        type: "READY",
-        id: todo.id,
-      });
-    }
   };
 
   return (
@@ -148,7 +106,15 @@ function App() {
             sx={{ color: "green", ml: 3 }}
           />
         </Grid>
-        <Typography variant="body1" sx={{mt: 3}}>{toDoList.length} Items</Typography>
+        {toDoList.length > 1 ? (
+          <Typography variant="body1" sx={{ mt: 3 }}>
+            {toDoList.length} Items
+          </Typography>
+        ) : (
+          <Typography variant="body1" sx={{ mt: 3 }}>
+            {toDoList.length} Item
+          </Typography>
+        )}
         <Grid item>
           {toDoList &&
             toDoList.map(
@@ -157,23 +123,15 @@ function App() {
                 (todo.status === "edit" ? (
                   <EditItem
                     todo={todo}
-                    handleUpdate={handleUpdate}
-                    editContent={editContent}
-                    setEditContent={setEditContent}
+                    dispatch={dispatch}
                     key={todo.id}
                   />
                 ) : todo.status === "done" ? (
-                  <DoneItem
-                    todo={todo}
-                    handleDelete={handleDelete}
-                    handleStatus={handleStatus}
-                    key={todo.id}
-                  />
+                  <DoneItem todo={todo} dispatch={dispatch} key={todo.id} />
                 ) : (
                   <ToDoItem
                     todo={todo}
-                    handleDelete={handleDelete}
-                    handleStatus={handleStatus}
+                    dispatch={dispatch}
                     key={todo.id}
                   />
                 ))

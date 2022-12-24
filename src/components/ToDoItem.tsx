@@ -6,15 +6,10 @@ import { TypeToDo } from "../App";
 
 interface ToDoType {
   todo: TypeToDo;
-  handleDelete: (id: string) => void;
-  handleStatus: (todo: TypeToDo, text: string) => void;
+  dispatch: any;
 }
 
-export default function ToDoItem({
-  todo,
-  handleDelete,
-  handleStatus,
-}: ToDoType) {
+export default function ToDoItem({ todo, dispatch }: ToDoType) {
   return (
     <Grid
       container
@@ -24,18 +19,20 @@ export default function ToDoItem({
       sx={{ mb: 2 }}
     >
       <Grid item>
-        <Checkbox onChange={() => handleStatus(todo, "done")} />
+        <Checkbox onChange={() => dispatch({ type: "DONE", id: todo.id })} />
       </Grid>
       <Grid item>
         <Typography sx={{ width: "14.5rem" }}>{todo.content}</Typography>
       </Grid>
       <Grid item>
         <EditIcon
-          onClick={() => handleStatus(todo, "edit")}
+          onClick={() => {
+            dispatch({ type: "EDIT", id: todo.id });
+          }}
           sx={{ color: "grey", mr: 1 }}
         />
         <HighlightOffIcon
-          onClick={() => handleDelete(todo.id)}
+          onClick={() => dispatch({ type: "DELETE", id: todo.id })}
           sx={{ color: "#f05650" }}
         />
       </Grid>
