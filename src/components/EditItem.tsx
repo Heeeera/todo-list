@@ -1,21 +1,15 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { useState } from "react";
 import { Grid, FormControl, Input } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { TypeToDo } from "../App";
 
 interface EditType {
   todo: TypeToDo;
-  handleUpdate: (todo: TypeToDo) => void;
-  editContent: string;
-  setEditContent: Dispatch<SetStateAction<string>>;
+  dispatch: any;
 }
 
-export default function EditItem({
-  todo,
-  handleUpdate,
-  editContent,
-  setEditContent,
-}: EditType) {
+export default function EditItem({ todo, dispatch }: EditType) {
+  const [editContent, setEditContent] = useState<string>("");
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditContent(e.target.value);
   };
@@ -38,7 +32,12 @@ export default function EditItem({
         </FormControl>
       </Grid>
       <Grid item>
-        <CheckIcon onClick={() => handleUpdate(todo)} sx={{ color: "green" }} />
+        <CheckIcon
+          onClick={() =>
+            dispatch({ type: "UPDATE", id: todo.id, content: editContent })
+          }
+          sx={{ color: "green" }}
+        />
       </Grid>
     </Grid>
   );

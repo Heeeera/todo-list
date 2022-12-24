@@ -5,11 +5,10 @@ import { TypeToDo } from "../App";
 
 interface DoneType {
   todo: TypeToDo;
-  handleDelete: (id: string) => void;
-  handleStatus: (todo: TypeToDo, text: string ) => void;
+  dispatch: any;
 }
 
-export default function DoneItem({ todo, handleDelete, handleStatus }: DoneType) {
+export default function DoneItem({ todo, dispatch }: DoneType) {
   return (
     <Grid
       container
@@ -22,7 +21,7 @@ export default function DoneItem({ todo, handleDelete, handleStatus }: DoneType)
         <Checkbox
           checked
           color="success"
-          onChange={() => handleStatus(todo, "ready")}
+          onChange={() => dispatch({ type: "READY", id: todo.id })}
         />
       </Grid>
       <Grid item>
@@ -38,7 +37,7 @@ export default function DoneItem({ todo, handleDelete, handleStatus }: DoneType)
       </Grid>
       <Grid item>
         <HighlightOffIcon
-          onClick={() => handleDelete(todo.id)}
+          onClick={() => dispatch({ type: "DELETE", id: todo.id })}
           sx={{ color: "#f05650" }}
         />
       </Grid>
